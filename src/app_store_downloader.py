@@ -4,7 +4,7 @@ from pathlib import Path
 import fire
 from app_store_scraper import AppStore
 
-data_path = Path("src/data")
+data_path = Path("data")
 
 
 def download(app_name: str, country: str = "us", count: int = 200):
