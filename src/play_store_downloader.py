@@ -17,7 +17,8 @@ def download(app_id="com.ubercab", country="us", count=1000):
         count=count,  # defaults to 1000
         filter_score_with=None,  # defaults to None(means all score)
     )
-    with open(str(data_path / f"{app_id}_{country}_play_store_reviews.json"), "w") as f:
+    file_path = str(data_path / f"{app_name}_{country}_play_store_reviews.json")
+    with file_path.open("w") as f:
         json.dump(result, f, indent=2, default=str)
     print(result)
 
