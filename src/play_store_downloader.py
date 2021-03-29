@@ -5,7 +5,7 @@ import fire
 from app_store_scraper import AppStore
 from google_play_scraper import Sort, reviews, reviews_all
 
-data_path = Path("src/data")
+data_path = Path("data")
 
 
 def download(app_id="com.ubercab", country="us", count=1000):
