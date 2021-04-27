@@ -1,6 +1,6 @@
 # Fanastic User Journeys
 
-[] Dataset Creation - Scrape at least 200 reviews each for 5 apps, spanning iOS and Android
+- [ ] Dataset Creation - Scrape at least 200 reviews each for 5 apps, spanning iOS and Android
 
 EDA
 - [ ] Vocabulary
