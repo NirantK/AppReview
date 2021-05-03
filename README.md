@@ -1,4 +1,4 @@
-# Fanastic User Journeys
+# App Reviews
 
 - [ ] Dataset Creation - Scrape at least 200 reviews each for 5 apps, spanning iOS and Android
 
