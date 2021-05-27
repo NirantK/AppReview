@@ -1,3 +1,8 @@
 app-store-scraper==0.3.5
 google-play-scraper==0.1.2
 fire==0.4.0
+spacy==3.0.6
+textacy==0.11.0
+tqdm==4.60.0
+pandas==1.1.5
+transformers==4.6.0
