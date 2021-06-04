@@ -9,13 +9,14 @@ streamlit run app.py
 from collections import Counter
 
 import matplotlib.pyplot as plt
+from numpy import flatiter
 import pandas as pd
 import seaborn as sns
 import spacy
 import streamlit as st
 from textacy import Corpus, extract
 from textacy.extract.basics import entities, ngrams, noun_chunks
-
+from textacy.extract.keyterms.yake import yake
 from pathlib import Path
 from typing import List
 
@@ -36,8 +37,9 @@ assert file_path.exists()
 st.sidebar.title("Options")
 word_count = st.sidebar.checkbox("Word Counts")
 ngrams_count = st.sidebar.checkbox("n-grams")
-show_ncs = st.sidebar.checkbox("Noun", value=True)
-show_ents = st.sidebar.checkbox("Entities")
+show_ncs = st.sidebar.checkbox("Noun", value=False)
+show_ents = st.sidebar.checkbox("Entities", value=False)
+show_yake = st.sidebar.checkbox("YAKE", value=True)
 
 
 @st.cache
@@ -80,6 +82,10 @@ def get_word_counts(
     most_common_df = pd.DataFrame(most_common, columns=["Words", "Count"])
     return most_common_df
 
+def plot_count(most_common_df: pd.DataFrame, n:int=10):
+    fig, ax = plt.subplots()
+    sns.scatterplot(data=most_common_df[:10], x="Count", y="Words")
+    st.pyplot(fig)
 
 if word_count:
     st.write("## Word Counts")
@@ -87,24 +93,22 @@ if word_count:
     most_common_df = get_word_counts(corpus)
     if DEBUG:
         st.dataframe(most_common_df[:10])
+    plot_count(most_common_df)
 
-    fig, ax = plt.subplots()
-    sns.scatterplot(data=most_common_df[:10], x="count", y="words")
-    st.pyplot(fig)
+def spacy_span_hash(input_span):
+    return str(input_span)
 
-
-def spacy_span_hash(input):
-    return str(input)
+def flatten_list(l:List)->List:
+    return [val for sublist in l for val in sublist]
 
 
 @st.cache(hash_funcs={spacy.tokens.span.Span: spacy_span_hash})
 def get_count(list_of_doc_terms: List[List], lower=True) -> pd.DataFrame:
+    terms_list = flatten_list(list_of_doc_terms)
     if lower:
-        terms_list = [
-            str(val).lower() for sublist in list_of_doc_terms for val in sublist
-        ]
+        terms_list = [str(term).lower() for term in terms_list]
     else:
-        terms_list = [str(val) for sublist in list_of_doc_terms for val in sublist]
+        terms_list = [str(term) for term in terms_list]
     terms_freq = dict(Counter(terms_list))
     df = pd.DataFrame.from_dict(terms_freq, orient="index")
     df.reset_index(inplace=True)
@@ -114,25 +118,46 @@ def get_count(list_of_doc_terms: List[List], lower=True) -> pd.DataFrame:
     return df
 
 
-def get_linguistic_counts(corpus=corpus, by="noun_chunks", **kwargs):
+def get_linguistic_counts(corpus=corpus, by:str="noun_chunks")->pd.DataFrame:
+    """
+    Extract the linguistic content needed
+
+    Args:
+        corpus ([type], optional): [description]. Defaults to corpus.
+        by (str, optional): [description]. Defaults to "noun_chunks".
+
+    Returns:
+        df (pd.DataFrame): 
+    """
     if by == "noun_chunks":
         list_of_doc_terms = [
             list(noun_chunks(doc, drop_determiners=True)) for doc in corpus
         ]
+        return get_count(list_of_doc_terms)
     elif by == "ents":
         list_of_doc_terms = [
             list(entities(doc, drop_determiners=True, exclude_types="NUMERIC"))
             for doc in corpus
         ]
-    return get_count(list_of_doc_terms)
+        return get_count(list_of_doc_terms)
+    elif by == "yake":
+        list_of_doc_terms = [yake(doc, topn=5) for doc in corpus]
+        terms_list = flatten_list(list_of_doc_terms)
+        df = pd.DataFrame(terms_list, columns=["Word", "Score"])
+        df.sort_values(by=["Score", "Word"], inplace=True,ascending=False)
+        return df
 
 
 if show_ncs:
     st.write("## Noun Phrases")
-    st.write(get_linguistic_counts(corpus))
+    df = get_linguistic_counts(corpus)
+    plot_count(df)
+    st.write(df)
 
 if show_ents:
     st.write("## Entities")
     st.write(get_linguistic_counts(corpus, by="ents"))
-    # terms_df = pd.DataFrame(dict(Counter(terms)))
-    # st.write(dict(Counter(terms)))
+
+if show_yake:
+    st.write("## Keywords by YAKE")
+    st.write(get_linguistic_counts(corpus, by="yake"))
