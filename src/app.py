@@ -9,7 +9,6 @@ streamlit run app.py
 from collections import Counter
 
 import matplotlib.pyplot as plt
-from numpy import flatiter
 import pandas as pd
 import seaborn as sns
 import spacy
@@ -28,7 +27,7 @@ st.write(
     "Depending on your hard disk and CPU, this can take a few minutes to run. Be patient!"
 )
 # File Paths
-data_dir = Path("../data/")
+data_dir = Path("../data/raw")
 assert data_dir.exists()
 clients = {"Uber": data_dir / "Uber_us_app_store_reviews.json"}
 file_path = clients["Uber"]
@@ -79,12 +78,12 @@ def get_word_counts(
         by="lemma_", filter_stops=True, filter_nums=True, filter_punct=True
     )
     most_common = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)[:25]
-    most_common_df = pd.DataFrame(most_common, columns=["Words", "Count"])
+    most_common_df = pd.DataFrame(most_common, columns=["Phrase", "Count"])
     return most_common_df
 
 def plot_count(most_common_df: pd.DataFrame, n:int=10):
     fig, ax = plt.subplots()
-    sns.scatterplot(data=most_common_df[:10], x="Count", y="Words")
+    sns.histplot(data=most_common_df[:10], x="Count", y="Phrase")
     st.pyplot(fig)
 
 if word_count:
