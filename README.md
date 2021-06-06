@@ -1,28 +1,65 @@
 # App Reviews
 
-- [ ] Dataset Creation - Scrape at least 200 reviews each for 5 apps, spanning iOS and Android
+## Getting Started
+Begin with installing the required dependencies and then the spaCy models. 
+Please note that optional dependencies are not in the `requirements.txt` file.
 
-EDA
-- [ ] Vocabulary
-- [ ] Using spaCy, check for common nouns, verbs and adjectives
-- [ ] Check data unbalance, distribution of variables by visualization
+```bash
+pip install -r requirements.txt
+```
 
-Topic Extraction
-- [ ] Using LDA and Yake! Keyword Extraction
+For speed, or when first time running the code. This is also the default spaCy model we use. 
+```
+python -m spacy en_core_web_sm download 
+```
 
-- [ ] Manual Tagging - Tag the ~1K records into categories which Product Leaders can use. These should ideally be around user pain points.
+## Inputs
+The data directory consists of two main directories: `raw` and `tagged`. 
 
-Text Pre-processing and Feature Engineering
-- [ ] If needed, remove the stop words and punctuations
+## Interactive Text Exploration App
 
-“Modelling as Text Classification with known categories”
-- [ ] “TF-NB-SVM”
-- [ ] “TF-IDF + RFC”
+Run the app from `src` directory with:
+```bash
+streamlit run app.py
+```
 
-- [ ] Visualization: Streamlit + Altair Demo
-- [ ] Topics, grouped by aggregate word frequency of top k words
+This app covers our text exploration. We do the following to understand the text better:
 
-- [ ] Keywords, sorted by word frequency
+- Vocabulary / Word Counts 
+- N-grams
+- Nouns
+**Topic Extraction**
+- (Unsupervised) Key Word Extraction with YAKE
 
-Model Evaluation
-- [ ] Accuracy and Micro-averaged F1
+Each of the above has a Seaborn or Altair Plot of the first 10-20 results
+- [x] Visualization: Streamlit + Altair Demo
+- [x] Topics, grouped by aggregate word frequency of top k words
+
+## Notebooks
+
+For each app review, we have more than one label possible. This means our dataset is multi-label.
+
+### 1.1 Data Exploration
+
+### 2.1 Label Finding
+
+### 3.1 TF-IDF-NB-LR
+
+We builds on the work from [Wang and Manning](https://nlp.stanford.edu/pubs/sidaw12_simple_sentiment.pdf).
+
+The [J. Howard implementation from Kaggle](https://www.kaggle.com/jhoward/nb-svm-strong-linear-baseline) proposes two changes: 
+1. Using Logistic Regression instead of Support Vector Machine as the 2nd stacked model
+2. Using TF-IDF instead of TF for feature extraction
+
+We keep the model equations (Naive Bayes and LR) unchanged but instead binarize each label against the review. This allows us to use the existing implementation with relative ease.
+
+### 3.2 Model Evaluation
+
+We train and evaluate a separate model for each label, where each label now only has binary values against review. This makes evaluation relatively straightforward.
+
+We calculate the following metrics for each model, trained on a separate label:
+1. Precision
+2. Recall
+3. F1 Score
+
+We do so at multiple thresholds to get a sense of the model performance itself.
