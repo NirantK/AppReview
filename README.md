@@ -16,7 +16,7 @@ python -m spacy en_core_web_sm download
 ## Inputs
 The data directory consists of two main directories: `raw` and `tagged`. 
 
-## Interactive Text Exploration App
+## 1.0 Interactive Text Exploration App
 
 Run the app from `src` directory with:
 ```bash
@@ -28,6 +28,7 @@ This app covers our text exploration. We do the following to understand the text
 - Vocabulary / Word Counts 
 - N-grams
 - Nouns
+
 **Topic Extraction**
 - (Unsupervised) Key Word Extraction with YAKE
 
@@ -39,13 +40,14 @@ Each of the above has a Seaborn or Altair Plot of the first 10-20 results
 
 For each app review, we have more than one label possible. This means our dataset is multi-label.
 
-### 1.1 Data Exploration
-
 ### 2.1 Label Finding
+
+We attack the problem of using Topic Modeling and Linguisic terms to find relevant topics and select meaningful labels. We also use `PyDantic` to define our Topic class to manage all the terms related to a specific topic in one object. 
+We assume that we have no labels for the dataset in order to reflect more common situations.
 
 ### 3.1 TF-IDF-NB-LR
 
-We builds on the work from [Wang and Manning](https://nlp.stanford.edu/pubs/sidaw12_simple_sentiment.pdf).
+We build on the work from [Wang and Manning](https://nlp.stanford.edu/pubs/sidaw12_simple_sentiment.pdf).
 
 The [J. Howard implementation from Kaggle](https://www.kaggle.com/jhoward/nb-svm-strong-linear-baseline) proposes two changes: 
 1. Using Logistic Regression instead of Support Vector Machine as the 2nd stacked model
